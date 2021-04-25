@@ -1,0 +1,21 @@
+{
+	"data" : [
+		{
+			"nama": "Dion",
+			"umur": "20",
+			"tgl": "3"
+		},{
+			"nama": "Dion",
+			"umur": "20",
+			"tgl": "3"
+		},{
+			"nama": "Yuhuu",
+			"umur": "19",
+			"tgl": "23"
+		},{
+			"nama": "Testing",
+			"umur": "15",
+			"tgl": "18"
+		}
+	]
+}

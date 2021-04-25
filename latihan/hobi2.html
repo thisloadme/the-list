@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hobi ku</title>
+	<script src="../vue.min.js"></script>
+	<style type="text/css">
+		.hijau{
+			color: green;
+		}
+		.merah{
+			color: red;
+		}
+		.kuning{
+			color: yellow;
+		}
+		.bool{
+			font-style: italic;
+		}
+	</style>
+</head>
+<body>
+
+	<div class="ini_id">
+		<h1>{{ judul }}</h1>
+		<hr>
+		<x v-html="html"></x>
+		<hr>	
+		<input type="text" v-model="judul">
+		<input type="radio" name="bukuA" value="hijau bool" v-model="buku">
+		<label for="bukuA">hijau</label>
+		<input type="radio" name="bukuB" value="merah" v-model="buku">
+		<label for="bukuB">merah</label>
+		<input type="radio" name="bukuC" value="kuning" v-model="buku">
+		<label for="bukuC">kuning</label>
+		<br>	
+		{{buku}}
+		<hr>
+		<input type="checkbox" v-model="bool" value="A">A
+		<input type="checkbox" v-model="bool" value="B">B
+		<input type="checkbox" v-model="bool" value="C">C
+		<br>
+		<ul>
+			<li v-for="(val, key) in bool">
+				{{ key+1 }}. {{ val }}
+			</li>
+		</ul>
+		<hr>	
+		<h1 :class="buku">Ini Text ber class</h1>
+		<hr>
+		<input type="number" v-model.number="angka1">
+		<input type="number" v-model.number="angka2">
+		{{ hasil_hitung }}
+		<hr>
+		<button @click="increment1(1)">+</button>
+		<button @click="increment2(2)">+</button>
+		<hr>
+		<input type="text" @keyup.enter="masukin_array($event.target.value)">
+		<ul>
+			<li v-for="(val, key) in bool">{{ val }} <button @click="hapus_array(key)">hapus</button></li>
+		</ul>
+		<hr>
+		<ini-com-ponent :title="judul" :hasil="hasil_hitung"></ini-com-ponent>
+		<hr>
+		<komponen2></komponen2>
+	</div>
+
+<script type="text/javascript">
+	// inisialisasi objek vue
+
+	Vue.component('IniComPonent', {
+		data(){
+			return{
+				judul: 'Komponen'
+			}
+		},
+		props: ['title', 'hasil'],
+		template: `<p>Ini adalah judul {{ judul }}, kalo ini title {{ title }} <br> hasil htung : {{ hasil }}</p>`
+	})
+
+	var Komponen2 = {
+		template: `<p>ini dari Komponen2</p>`	
+	}
+
+	var app = new Vue({
+		el: '.ini_id',
+		components: {
+			'komponen2': Komponen2
+		},
+		data: {
+			bool: [],
+			buku: '',
+			angka1: 0,
+			angka2: 0,
+			judul: 'Hay...',
+			html: '<p color="red">Ini isinya syntax p </p>',
+			class_h1: 'ini_classnya'
+		},
+		computed: {
+			hasil_hitung(){
+				// return parseInt(this.angka1)+parseInt(this.angka2)
+				return this.angka1+this.angka2
+			}
+		},
+		methods: {
+			increment1(val){
+				this.angka1++
+			},
+			increment2(val){
+				this.angka2++
+			},
+			masukin_array(val){
+				this.bool.push(val)
+			},
+			hapus_array(key){
+				this.bool.splice(key, 1)
+			}
+		},
+		beforeCreated(){
+			alert(this.judul)
+		},
+		created(){
+			alert(this.judul)
+		}
+	})
+</script>
+
+</body>
+</html>

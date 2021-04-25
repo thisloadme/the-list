@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Latihan Vue</title>
+	<script src="../vue.min.js"></script>
+</head>
+<body>
+
+	<div id="app">
+		<judul title="Input Hobi"></judul><br>
+		<input type="text" @keyup.enter="hobi_baru($event.target.value)" ref="inputan_hobi">
+		<br>
+		<span>Hobi Anda: </span>
+		<ul>
+			<li v-for="(val, key) in hobi">
+				{{ val }} 
+				<button @click="hapus_hobi(key)">hapus</button>
+			</li>
+		</ul>
+	</div>
+
+<script type="text/javascript">
+	var Judul = {
+		props: ['title'],
+		template: `<h1>{{ title }}</h1>`
+	}
+
+	var app = new Vue({
+		el: '#app',
+		data: {
+			hobi: [],
+		},
+		components: {
+			'judul': Judul
+		},
+		methods: {
+			hobi_baru(val){	
+				this.hobi.push(val)
+				this.$refs.inputan_hobi.value = ''
+			},
+			hapus_hobi(val){
+				this.hobi.splice(val,1)
+			},
+		},
+		mounted(){
+			alert('Selamat Datang di Hobi')
+		}
+	})
+</script>
+</body>
+</html>

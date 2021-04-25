@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Belajar Komponen</title>
+	<script src="vue.min.js"></script>
+	<style type="text/css">
+		.data{
+			background-color: teal;
+			padding: 10px;
+			width: 200px;
+			height: fit-content;
+			text-align: center;
+			display: inline-block;
+			margin: 0px 5px;
+		}
+		/*css bawaan vue.js untuk transisi*/
+		.fade-enter-active, .fade-leave-active {
+			transition: opacity .5s;
+		}
+		.fade-enter, .fade-leave-to {
+			opacity: 0;
+		}
+		/*end css bawaan*/
+
+	</style>
+</head>
+<body>
+
+	<div id="app">
+		<p><strong>Memanggil global komponen</strong></p>
+		<hello-world-global></hello-world-global>
+		<br>
+		<hr>
+		<p><strong>Memanggil local komponen</strong></p>
+		<hello-world-lokal></hello-world-lokal>
+		<br>
+		<hr>
+		<p><strong>Reusable global komponen</strong></p>
+		<hello-world-global></hello-world-global>  <!-- reusable -->
+		<br>
+		
+		<!-- coba props -->
+		<hr>
+		<p><strong>Props</strong></p>
+		<card
+			judul="ini judul"
+			deskripsi="ini deskripsi"
+			gambar="app.png"
+			width="100"
+		>
+		</card>
+
+		<!-- kirim per props -->
+		<!-- <p>loop per props</p> -->
+		<card v-for="(val,index) in koleksi" 
+			:key="index"
+			:judul="val.judul"
+			:deskripsi="val.deskripsi"
+			:gambar="val.gambar"
+			:width="val.width"
+		>
+		</card><br><br>
+		<!-- kirim pake objek -->
+		<!-- dan mengganti data yang di objek dengan componen -->
+		<hr>
+		<p><strong>Loop pake objek</strong></p>
+		<card2 v-for="(val,index) in koleksi" 
+			:key="index"
+			:koleksi="val"
+			@selected="selectedData = $event"
+		>
+		</card2>
+		(i see no beda :v)
+		<br>
+		<h3>Data Terpilih : {{ selectedData }}</h3>
+		<br>
+
+		<hr>
+		<p><strong>Two way binding</strong></p>
+		<custom-input
+			v-model="pencarian" 
+		>
+		</custom-input>
+		<!-- v-model="pencarian" = :value="pencarian" @input="$event.target.value" -->
+		<br><p>hasil cari : {{ pencarian }}</p>
+		<br>
+
+
+		<hr>
+		<p><strong>Slots</strong></p>
+		<!-- slot bernama -->
+		<!-- slot bernama tidak bisa dibarengin sama slot tak bernama -->
+		<!-- slot:slot1  : slot1 adalah nama slot -->
+		<div-berslot>
+			<template v-slot:slot2>
+				Ini adalah slot 2
+			</template>
+
+			<template v-slot:slot1>
+				Ini buat slot 1
+			</template>
+		</div-berslot>
+		<br>
+
+		<hr>
+		<p><strong>Akses slot data</strong></p>
+			<!-- slotData : hanyalah sebuah variabel bebas -->
+			<!-- sd : alias dari slotData -->
+			<!-- :default : digunakan jika dalam komponen hanya ada 1 slot, aslinya nama dari slot itu -->
+			<!-- v-slot bisa diganti dengan # -->
+
+			<!-- gunakan sembarang # untuk nama slot dinamis -->
+			<!-- hanya untuk 1 slot -->
+		<slot-berdata>
+			<template #ini-slot="{sd: slotData}">
+				<h3> {{ sd.peringatan }} </h3>
+			</template>
+		</slot-berdata>
+		<br>
+
+		<hr>
+		<p><strong>Dynamic Component Render</strong></p>
+		<button @click="selectedTab = 'tab1'">Tab 1</button>
+		<button @click="selectedTab = 'tab2'">Tab 2</button><br>
+		<div class="data">
+			<transition name="fade" mode="out-in">
+				<component :is="selectedTab"></component>
+			</transition>
+		</div>
+	</div>
+
+
+	<script type="text/javascript">
+		//penulisan nama component,
+		// 1. hello-world
+		// 2. HelloWorld
+		// tapi ketika pemanggilan di dom html
+		// harus hello-world
+
+		// susunan properti komponen dan objek utama umumnya sama
+		// hanya data yang berbeda, ketika objek data berupa objek
+		// di komponen, data berupa fungsi
+
+		// template harus cuma 1 root (misal <div>...</div>)
+
+		// bikin komponen global
+		Vue.component('HelloWorldGlobal', {
+			data(){
+				return {
+					message: 'Hello World Global'
+				}
+			},
+			template: '<h1>{{ message }}</h1>'
+		})
+
+		Vue.component('custom-input', {
+			props: ['value'],
+			template: `
+				<input 
+					type="text" 
+					:value="value"
+					@input="$emit('input', $event.target.value)"
+				>
+			`
+		})
+
+		// sediakan master slot, jika slot tidak diisi dari html
+		Vue.component('div-berslot', {
+			template: `
+				<div>
+					<slot name="slot1"></slot>
+					<br>
+					<slot name="slot2"></slot>
+				</div>
+			`
+		})
+
+		Vue.component('slot-berdata', {
+			// gunakan [] untuk nama slot dinamis
+			data(){
+				return {
+					peringatan: 'Awas!',
+					nama: 'ini-slot'
+				}
+			},
+			template: `
+				<div>
+					<slot :[nama]="peringatan">{{ peringatan }}</slot>
+				</div>
+			`
+		})
+
+		// bikin komponen lokal
+		var HelloWorldLokal = {
+			data(){
+				return {
+					message: 'Hello World Lokal'
+				}
+			},
+			template: '<h1>{{ message }}</h1>'
+		}
+
+		var Card = {
+			data(){
+				return {
+					data: 'data'
+				}
+			},
+			props: ['judul', 'deskripsi' ,'gambar', 'width'],
+			template: `
+				<div :class="data">
+					<img :src="gambar" :width="width">
+					<br> <h3>{{ judul }}</h3>
+					<br> <h5>{{ deskripsi }}</h5>
+				</div>
+			`
+		}
+
+		var Card2 = {
+			data(){
+				return {
+					data: 'data'
+				}
+			},
+			props: ['koleksi'],
+			template: `
+				<div :class="data">
+					<img :src="koleksi.gambar" :width="koleksi.width">
+					<br> <h3>{{ koleksi.judul }}</h3>
+					<br> <h5>{{ koleksi.deskripsi }}</h5>
+					<br>
+					<button @click="$emit('selected', koleksi.judul)">Pilih</button>
+				</div>
+			`
+		}
+
+		var tab1 = {
+			template: `
+				<div>
+					<h4>Tab 1</h4>
+					<h6>Dion Budi Riyanto di tab 1</h6>
+				</div>
+			`
+		}
+
+		var tab2 = {
+			template: `
+				<div>
+					<h4>Tab 2</h4>
+					<h6>Riyanto Budi Dion di tab 2</h6>
+				</div>
+			`
+		}
+
+
+		// mixin
+		// kayak sebuah variabel yang berisi fungsi fungsi yang banyak dipakai, dan diulang ulang
+		// nantinya disatukan pada objek/component, untuk melebur bersama
+		var HayMixin = {
+			created(){
+				this.hello()
+			},
+			methods: {
+				hello(){
+					console.log('Ini kiriman dari mixin')
+				}
+			}
+		}
+
+		var vm = new Vue({
+			el: '#app',
+			components: {
+				'HelloWorldLokal': HelloWorldLokal,
+				'card': Card,
+				'card2': Card2,
+				'tab1': tab1,
+				'tab2': tab2,
+			},
+			mixins: [
+				HayMixin
+			],
+			data: {
+				selectedTab: 'tab1',
+				selectedData: '',
+				pencarian: '',
+				koleksi:[
+					{
+						'judul': 'Dion',
+						'deskripsi': 'Ini adalah deskripsi dari Dion',
+						'gambar': 'app.png',
+						'width': '100',
+					},{
+						'judul': 'Yuhuu',
+						'deskripsi': 'Ini adalah deskripsi dari Yuhuu',
+						'gambar': 'aq.png',
+						'width': '100',
+					},{
+						'judul': 'Testing',
+						'deskripsi': 'Ini adalah deskripsi dari Testing',
+						'gambar': 'eab.png',
+						'width': '100',
+					},
+				],
+			}
+		})
+	</script>
+</body>
+</html>

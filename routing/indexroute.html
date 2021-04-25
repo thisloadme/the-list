@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Belajar Route</title>
+	<script src="../vue.min.js"></script>
+	<script src="../vue-router.min.js"></script>
+	<style type="text/css">
+		.fade-enter-active, .fade-leave-active {
+			transition: opacity .5s;
+		}
+		.fade-enter, .fade-leave-to {
+			opacity: 0;
+		}
+
+	</style>
+</head>
+<body>
+
+	<div id="app">
+		<p>
+			<router-link to="/">Home</router-link>
+			<router-link :to="{name: 'about'}">About</router-link>
+			<router-link to="/books">Buku</router-link>
+		</p>
+
+		<transition name="fade" mode="out-in">
+			<router-view></router-view>
+		</transition>
+			<h5>alamat yang diakses : {{ $route.path }}</h5>
+
+	</div>
+
+<!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+	<script type="text/javascript">
+		// definisikan konfigurasi component
+		const Home = { template: '<div>Halaman Home</div>' }
+		const About = { template: '<div>Hay saya adalah Dion Budi Riyanto</div>' }
+		const BookComponent = {
+			data(){
+				return {
+					books: [
+						{
+							id: 1,
+							judul: 'Judul Buku 1',
+							pengarang: 'Dion Budi Riyanto',
+							images: 'app.png'
+						},{
+							id: 2,
+							judul: 'Judul Buku 2',
+							pengarang: 'Budi Riyanto Dion',
+							images: 'aq.png'
+						},{
+							id: 3,
+							judul: 'Judul Buku 3',
+							pengarang: 'Riyanto Dion Budi',
+							images: 'eab.png'
+						},{
+							id: 4,
+							judul: 'Judul Buku 4',
+							pengarang: 'Dion Budi Riyanto2',
+							images: 'app.png'
+						},{
+							id: 5,
+							judul: 'Judul Buku 5',
+							pengarang: 'Dion Budi Riyanto3',
+							images: 'aq.png'
+						},
+					]
+				}
+			},
+			template: `
+				<div>
+					<h1>Daftar Buku</h1>
+					<ul>
+						<li v-for="(val, index) in books" :key="index">
+							<router-link :to="'/book/'+val.id">{{ val.judul }}</router-link>
+						</li>
+					</ul>
+				</div>
+			`
+		}
+
+		const BookDetail = {
+			data(){
+				return {
+					books: [
+						{
+							id: 1,
+							judul: 'Judul Buku 1',
+							pengarang: 'Dion Budi Riyanto',
+							images: 'app.png'
+						},{
+							id: 2,
+							judul: 'Judul Buku 2',
+							pengarang: 'Budi Riyanto Dion',
+							images: 'aq.png'
+						},{
+							id: 3,
+							judul: 'Judul Buku 3',
+							pengarang: 'Riyanto Dion Budi',
+							images: 'eab.png'
+						},{
+							id: 4,
+							judul: 'Judul Buku 4',
+							pengarang: 'Dion Budi Riyanto2',
+							images: 'app.png'
+						},{
+							id: 5,
+							judul: 'Judul Buku 5',
+							pengarang: 'Dion Budi Riyanto3',
+							images: 'aq.png'
+						},
+					]
+				}
+			},
+			props: ['id'],
+			computed: {
+				book(){
+					var bukunya = this.books.filter( (book) => {
+						// return book.id === parseInt(this.$route.params.id) tanpa props
+						return book.id === parseInt(this.id)
+					})
+
+					// jika buku tidak ada
+					if (bukunya.length == 0) {
+						alert('Buku tidak ada')
+						// this.$router.push('/books')
+						router.go(-1) //kembali 1 langkah
+					}else{
+						return bukunya[0]
+					}
+				}
+			},
+			template: `
+				<div v-if="book">
+					<img :src="'../'+book.images" width="200"></img>
+					<h1>{{ book.judul }}</h1>
+					<ul>
+						<li v-for="(val, key) in book" :key="index">
+							{{ key+' : '+val }}
+						</li>
+					</ul>
+				</div>
+			`,
+			beforeRouteLeave (to, from, next){ //konfirmasi meninggalkan halaman
+				const answer = window.confirm('Apakah Anda Yakin akan meninggalkan halaman ini ?')
+				if (answer) {
+					next()
+				}else{
+					next(false)
+				}
+			}
+		}
+
+		// mapping path dengan componennya, harus urut atas- bawah
+		const routes = [
+			{ path: '/', name:'home', component: Home, alias: '/home' },
+			{ path: '/about', name:'about', component: About },
+			{ path: '/books', name:'books', component: BookComponent },
+			{ path: '/book/:id', name:'book', component: BookDetail, props: true }, //props true jika di computed book() ada properti props
+			{ path: '*', redirect: '/' } //jika url yg diminta tidak ditemukan
+			// meta: { login:true } maksudnya halaman itu hanya bisa diakses sama user yg sudah login
+		]
+
+		// register routes
+		const router = new VueRouter({
+			routes: routes
+		})
+
+		// // sebuah guard navigasi yang diimplementasikan sebelum route dituju
+		// router.beforeEach((to, from, next) => {
+		// 	if (to.matched.some(record => record.meta.login)){ //mendapatkan meta login untuk route terpilih (true false)
+  // 				alert('Halaman ini hanya untuk yang sudah login')
+		// 		next(false)
+		// 	} 
+  // 			else {
+		// 		next()
+  // 			} 
+		// })
+
+		// // sebuah guard navigasi yang diimplementasikan setelah route dituju
+		// router.afterEach((to, from  ) => {
+
+		// })
+
+		// register objek
+		var vm = new Vue({
+			el:'#app',
+			router
+		})
+	</script>
+</body>
+</html>

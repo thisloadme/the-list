@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Form Vue</title>
+	<script src="vue.min.js"></script>
+</head>
+<body>
+
+	<!-- v-model="var" : untuk mengubah data di objek secara realtime-->
+	<!-- modifier v-model -->
+	<!-- .trim : untuk menghapus spasi di kanan kiri -->
+	<!-- .number : untuk memastikan hanya angka -->
+
+	<div id="app">
+		<form>
+			<p><strong>Input Text</strong></p>
+			<input type="text" name="title" v-model.trim="title">
+			<p>title: {{ title }}</p><br>
+			<p><strong>Input Number</strong></p>
+			<input type="number" name="umur" v-model.number="umur">
+			<p>umur: {{ umur }}</p>	
+			<br>
+			<p><strong>Input Radio</strong></p>
+			<input type="radio" name="bukuA" value="A" v-model="buku">
+			<label for="bukuA">Buku A</label>
+			<input type="radio" name="bukuB" value="B" v-model="buku">
+			<label for="bukuB">Buku B</label>
+			<input type="radio" name="bukuC" value="C" v-model="buku">
+			<label for="bukuC">Buku C</label>
+			<p>buku: {{ buku }}</p>
+			<br>
+			<p><strong>Input Combo</strong></p>
+			<select name="gender" v-model="gender">
+				<option disabled value="">Pilih satu</option>
+				<option value="L">Laki - Laki</option>
+				<option value="P">Perempuan</option>
+			</select>
+			<p>gender: {{ gender }}</p>
+			<br>
+			<p><strong>Input Checkbox Boolean</strong></p>
+			Setuju : 
+			<input type="checkbox" name="setuju" v-model="setuju">
+			<label for="setuju">{{ setuju }}</label>
+			<br>
+			<p><strong>Input Checkbox String</strong></p>
+			<div v-for="val in opt_hobi">
+				<input type="checkbox" name="hobi" :value="val.text" v-model="hobi">
+				<label :for="hobi + val.ind">{{ val.text }}</label>
+			</div>
+			<p>Hobi : 
+				<ul>
+					<li v-for="val in hobi">
+						{{ val }}
+					</li>
+				</ul>
+			</p>
+			<br>
+			<p><strong>Input Multiple Select</strong></p>
+			<select name="favorit" v-model="favorit" multiple>
+				<option disabled value="">Pilih banyak</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+			</select>
+			<ul>
+				<li style="list-style: none;">
+					Pilihan : 
+				</li>
+				<li v-for="val in favorit">
+					{{ val }}
+				</li>
+			</ul>
+			<br>
+			<p><strong>Search data Array</strong></p>
+			Cari Array (case sensitive):
+			<input type="text" name="keyword_arr_buku" v-model="keyword_arr_buku" placeholder="cari...">
+			<ul>
+				<li v-for="(val,index) in cari_arr_buku" :key="index">
+					{{ val }}
+				</li>
+			</ul>
+		</form>
+		<br>
+	</div>
+	
+	<br>
+	<hr><p><strong>Form - Server</strong></p>
+
+	<div id="form_input">
+
+		<div v-if="errors.length">
+			<span>Ups, ada error</span>
+			<div v-for="(val,index) in errors" style="padding-bottom: 2px">
+				<p style="color: red">{{ index+1 }}. {{ val }}</p>
+			</div>
+		</div>
+
+		<form @submit.prevent="submitForm" ref="form_identitas">
+			<label>Nama Kamu :</label>
+			<input type="text" name="nama" ref="nama" v-model="nama">
+			<br>
+			<label>Umur Kamu :</label>
+			<input type="number" name="umur" ref="umur" v-model.number="umur">
+			<br>
+			<label>Deskripsi tentang Kamu :</label>
+			<input type="text" name="deskripsi" ref="deskripsi" v-model="deskripsi">
+			<br>
+			<label>Pilih Hobi :</label>
+			<select v-model="hobi" ref="hobi">
+				<option v-for="(val,index) in hobi_array" :key="index" :value="val.value">
+					{{ val.text }}
+				</option>
+			</select>
+			<br>
+			<label>Foto :</label>
+			<input type="file" name="gambar" ref="gambar">
+			<br>
+			<label></label>
+			<input type="submit" value="Kirim">
+		</form>
+	</div>
+
+
+	<script type="text/javascript">
+		var sf = new Vue({
+			el: '#form_input',
+			data: {
+				nama: '',
+				umur: 0,
+				deskripsi: '',
+				hobi: [],
+				hobi_array: [
+					{
+						text: 'Berenang',
+						value: 'B'
+					},{
+						text: 'Sepak Bola',
+						value: 'SB'
+					},{
+						text: 'Main HP',
+						value: 'MHP'
+					},{
+						text: 'Belajar',
+						value: 'B'
+					},
+				],
+				errors: [],
+			},
+			methods: {
+				submitForm(e){ //dan validasi
+					this.errors = []
+					if (this.nama == '' || this.umur == 0 || this.deskripsi == '' || this.hobi == '') {
+						this.errors.push('Tolong lengkapi form')
+					}else{
+						//$refs diambil dari attr ref di form
+						if (this.nama.length < 4) {
+							this.errors.push('Nama minimal 4 karakter')
+							this.$refs.nama.focus()
+						}
+
+						if (this.deskripsi.length < 10) {
+							this.errors.push('Deskripsi minimal 10 karakter')
+							this.$refs.deskripsi.focus()
+						}
+
+						if (this.hobi.length === 0) {
+							this.errors.push('Pilih satu hobi')
+							this.$refs.hobi.focus()
+						}
+
+						if (this.errors.length === 0) {
+							// persiapan data ke server, ada beberapa cara
+							// 1. fd.append('input_name', val)
+							// 2. new FormData(identitas form(id/ref)) // ntar diambil name nya
+							// 3. 
+							var gambar = this.$refs.gambar.files[0]
+							var datanya = this.$refs.form_identitas
+							var fd = new FormData(datanya)
+							// var fd = new FormData()
+							fd.append('gambar', gambar)
+							// fd.append('umur', this.umur)
+							// fd.append('deskripsi', this.deskripsi)
+							
+							// definisi objek xmlhttp
+							var xhttp = new XMLHttpRequest()
+
+							// definisi fungsi ketika terjadi perubahan state
+							xhttp.onreadystatechange = function(){
+
+								// ketika data terkirim dan respon server sukses
+								if (this.readyState == 4 && this.status == 200) {
+									//respon dari server
+									var obj = JSON.parse(this.responseText)
+									if (obj.success) {
+										alert(obj.nama+' Berhasil masuk') 
+									}
+								}
+							}
+
+							// buka hubungan ke server
+							xhttp.open('POST', 'proses.php', true)
+							// kirim form data
+							xhttp.send(fd)
+						}
+					}
+					e.preventDefault()
+				}
+			}
+		});
+
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				title: '',
+				umur: 0,
+				buku: '',
+				gender: '',
+				setuju: true,
+				hobi: [],
+				opt_hobi: [
+					{
+						text: 'Jalan',
+						ind: 1
+					},{
+						text: 'Sendirian',
+						ind: 2
+					},{
+						text: 'Jomblo',
+						ind: 3
+					},
+				],
+				favorit: [],
+				arr_buku: [
+					'Cara menjadi seorang sukses',
+					'Menjadi Orang sukses',
+					'Jadi Sukses kuy',
+					'Yuk menjadi orang yang sukses',
+				],
+				keyword_arr_buku: '',
+			},
+			computed: {
+				cari_arr_buku (){
+					return this.arr_buku.filter((buku) => {
+						return buku.includes(this.keyword_arr_buku)
+					})
+				}
+			},
+		})
+	</script>
+</body>
+</html>

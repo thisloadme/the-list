@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Belajar Vuex</title>
+	<script src="../vue.min.js"></script>
+	<script src="../vuex.min.js"></script>
+</head>
+<body>
+
+	<div id="app">
+		{{ counter }}<br>
+		<button @click="increase"> + </button>
+		<br>
+
+		<hr>
+		<p>Async</p>
+		<ul>
+			<li v-for="(val,index) in datadiri">
+				{{ val.nama }}
+			</li>
+		</ul>
+
+		<hr>
+		<p>Two way binding</p>
+		<input type="text" v-model="nama">
+		{{ nama }}
+	</div>
+
+	<!-- <script type="module">
+		import Terklik from './Terklik.js'
+	</script> -->
+	<script type="text/javascript">
+		// untuk management state, menggunakan library vuex
+		// store vuex bertanggung jawab atas semua perubahan yang ada pada state
+		// setelah tercatat di history, bisa revert perubahan, time travel
+		const store = new Vuex.Store({
+			strict: true,  //akan memberikan error ketika state berubah diluar mutations, matikan strict saat production
+			state: {   //daftar state yang ada di apl
+				hitung: 0,
+				terklik: 0,
+				datadiri: [],
+				nama:''
+			},
+			mutations: {   // fungsi fungsi yang mengubah kondisi state, pasti berhubungan dengan state
+				//mutations tidak mendukung async
+				increment(state, n){  //param kedua sebagai payload(params)
+					state.hitung += n
+				},
+				decrement(state){
+					state.hitung--
+				},
+				terklik(state){
+					state.terklik++
+				},
+				set_datadiri(state, data){
+					state.datadiri = data
+				},
+				set_nama(state, nama){
+					state.nama = nama
+				}
+			},
+			actions: {  // action berguna untuk memanggil mutations tertentu, mendukung async
+				increment(context, n){
+					context.commit('increment', n);
+				},
+				get_datadiri({commit}){  //async menggunakan Promise
+					return new Promise((resolve, reject) => {
+						var xhr = new XMLHttpRequest();
+						xhr.open('GET', 'http://localhost:8080/latihan_vue/vuex/data.json');
+						xhr.onload = function(){
+							if (this.status >= 200 && this.status < 300) {
+								commit('set_datadiri', JSON.parse(xhr.response)) //hasilnya di commit ke mutation
+								resolve(JSON.parse(xhr.response)); //ini yang direturn oleh action ketika dipanggil di objek
+							}else{
+								reject({
+									status: this.status,
+									statusText: xhr.statusText
+								});
+							}
+						};
+
+						xhr.onerror = function(){
+							reject({
+									status: this.status,
+									statusText: xhr.statusText
+								});
+						};
+						xhr.send();
+					})
+				}
+			},
+			getters: { //getters digunakan agar objek tidak nembak langsung ke state, juga getters bisa memproses state itu dahulu
+				hitung(state){
+					return state.hitung+1
+				},
+				data_diri(state){
+					return state.datadiri
+				},
+				nama(state){
+					return state.nama
+				}
+			}
+		})
+
+		// objek
+
+		var vm = new Vue({
+			el: '#app',
+			store: store,  //memanggil store, agar bisa diakses komponen lokal di luar objek
+			computed: {
+				counter(){
+					return store.getters.hitung  //memanggil state store ke dalam objek
+				},
+				terklik(){
+					return store.state.terklik
+				},
+				datadiri(){
+					return store.getters.data_diri['data']
+				},
+				nama:{
+					get(){
+						return store.getters.nama
+					},
+					set(val){
+						store.commit('set_nama', val)
+					}
+				}
+			},
+			methods: {
+				increase(){
+					//store.commit('increment', 10)  //memanggil store mutation, agar perubahan tercatat oleh history
+					store.dispatch('increment', 10) // gunakan dispatch ketika memanggil action
+				},
+				decrease(){
+					store.commit('decrement')
+				},
+				terklik(){
+					store.commit('terklik')
+				}
+			},
+			created(){
+				store.dispatch('get_datadiri')
+					.then((response) => {
+						console.log('result : ', response);
+					})
+					.catch((error) => {
+						console.log('error : ', response);
+					})
+			}
+		})
+
+	</script>
+</body>
+</html>
+
+
+<!-- 
+
+kesimpulan state management:
+
+1. state managemetn adalah kayak deklarasi objek global yang bisa diakses oleh kompoenen manapun, menggunakan Vuex.Store
+2. dalam store ada
+state: seperti data di objek vue
+mutations: seperti method di objek vue, ga bisa async, panggil menggunakan store.commit
+actions: menjalankan mutation, bisa menjalankan async, panggil menggunakan store.dispatch
+getters: memanggil state, yang nantinya dipanggil di objek, panggil menggunakan store.getters
+
+
+ -->

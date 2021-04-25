@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Halaman Login</title>
+	<script src="../vue.min.js"></script>
+	<script src="../vue-router.min.js"></script>
+</head>
+<body>
+
+	<div id="app">
+		<form @submit.prevent="submitForm" ref="form_identitas">
+			<label>Nama Kamu :</label>
+			<input type="text" name="nama" ref="nama" v-model="nama">
+			<br>
+			<label>Umur Kamu :</label>
+			<input type="number" name="umur" ref="umur" v-model.number="umur">
+			<br>
+			<label></label>
+			<input type="submit" value="Kirim">
+		</form>
+	</div>
+
+
+	<script type="text/javascript">
+		var sf = new Vue({
+			el: '#app',
+			data: {
+				nama: '',
+				umur: 0,
+				deskripsi: '',
+				hobi: [],
+				hobi_array: [
+					{
+						text: 'Berenang',
+						value: 'B'
+					},{
+						text: 'Sepak Bola',
+						value: 'SB'
+					},{
+						text: 'Main HP',
+						value: 'MHP'
+					},{
+						text: 'Belajar',
+						value: 'B'
+					},
+				],
+				errors: [],
+			},
+			methods: {
+				submitForm(e){ //dan validasi
+					this.errors = []
+					if (this.nama == '' || this.umur == 0) {
+						this.errors.push('Tolong lengkapi form')
+					}else{
+						//$refs diambil dari attr ref di form
+						if (this.nama.length < 4) {
+							this.errors.push('Nama minimal 4 karakter')
+							this.$refs.nama.focus()
+						}
+
+						if (this.errors.length === 0) {
+							// persiapan data ke server, ada beberapa cara
+							// 1. fd.append('input_name', val)
+							// 2. new FormData(identitas form(id/ref)) // ntar diambil name nya
+							// 3. 
+							var datanya = this.$refs.form_identitas
+							var fd = new FormData(datanya)
+							// var fd = new FormData()
+							// fd.append('umur', this.umur)
+							// fd.append('deskripsi', this.deskripsi)
+							
+							// definisi objek xmlhttp
+							var xhttp = new XMLHttpRequest()
+
+							// definisi fungsi ketika terjadi perubahan state
+							xhttp.onreadystatechange = function(){
+
+								// ketika data terkirim dan respon server sukses
+								if (this.readyState == 4 && this.status == 200) {
+									//respon dari server
+									var obj = JSON.parse(this.responseText)
+									if (obj.success) {
+										window.location.href = 'http://localhost:8080/latihan_vue/routing/indexroute.html'
+									}else{
+										alert('Nama anda salah')
+									}
+								}
+							}
+
+							// buka hubungan ke server
+							xhttp.open('POST', 'proses.php', true)
+							// kirim form data
+							xhttp.send(fd)
+						}
+					}
+					e.preventDefault()
+				}
+			}
+		});
+	</script>
+</body>
+</html>

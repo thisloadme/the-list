@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Coba coba</title>
+	<script src="vue.min.js"></script>
+	<script src="vuex.min.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+</head>
+<body style="background: url(bg.jpg) no-repeat center center fixed; background-size: cover;">
+	<div id="app">
+		<table style="border-spacing: 0px!important; margin: 20vh auto;">
+			<tr style="background: #3c5058; border: none; height: 2vh; color: white">
+				<th style="padding: 1vh 2vw">No</th>
+				<th style="padding: 1vh 2vw">Name</th>
+				<th style="padding: 1vh 2vw">Telephone</th>
+				<th style="padding: 1vh 2vw">Email</th>
+				<th style="padding: 1vh 2vw">Country</th>
+				<th style="padding: 1vh 2vw">Picture</th>
+			</tr>
+			<tr v-for="(val,k) in data" :key="k">
+				<td :style="k%2===0 ? {'background': '#85dbeb'} : {'background': '#fefefe'}" style="height: 1.76vh; text-align: center;">{{ k + 1 }}</td>
+				<td :style="k%2===0 ? {'background': '#85dbeb'} : {'background': '#fefefe'}" style="height: 1.76vh;">{{val.name.first}} {{val.name.last}}</td>
+				<td :style="k%2===0 ? {'background': '#85dbeb'} : {'background': '#fefefe'}" style="height: 1.76vh;">{{val.phone}}</td>
+				<td :style="k%2===0 ? {'background': '#85dbeb'} : {'background': '#fefefe'}" style="height: 1.76vh;">{{val.email}}</td>
+				<td :style="k%2===0 ? {'background': '#85dbeb'} : {'background': '#fefefe'}" style="height: 1.76vh;">{{val.location.country}}</td>
+				<td :style="k%2===0 ? {'background': '#85dbeb'} : {'background': '#fefefe'}" style="height: 1.76vh; text-align: center;"><img :src="val.picture.thumbnail"></td>
+			</tr>
+		</table>
+	</div>
+	<script type="text/javascript" src="my.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Latihan Vue</title>
+	<script src="../vue.min.js"></script>
+	<style type="text/css">
+		input[type="number"]{
+			width: 100px;
+			padding: 5px;
+			height: 20px;
+		}
+		select{
+			padding: 5px;
+			height: 34px;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="app">
+		<judul></judul>
+		<kalkulator></kalkulator>
+	</div>
+
+<script type="text/javascript">
+
+	var Judul = {
+		data(){
+			return {
+				title: 'Kalkulator Sederhana'
+			}
+		},
+		template: `<h1>{{ title }}</h1>`
+	}
+
+	Vue.component('Kalkulator', {
+		data(){
+			return{
+				angka1: 0,
+				angka2: 0,
+				operasi: '+'
+			}
+		},
+		template: `
+		<div>
+			<input type="number" v-model.number="angka1">
+			<select @change="ganti_operasi($event.target.value)">
+				<option value="+">+</option>
+				<option value="-">-</option>
+				<option value="*">x</option>
+				<option value="/">:</option>
+			</select>
+			<input type="number" v-model.number="angka2">
+			<br>Hasil: {{ hasil_operasi }}
+		</div>
+		`,
+		computed:{
+			hasil_operasi(){
+				if (this.operasi == '+') {
+					return this.angka1 + this.angka2
+				}else if (this.operasi == '-') {
+					return this.angka1 - this.angka2
+				}else if (this.operasi == '*') {
+					return this.angka1 * this.angka2
+				}else if (this.operasi == '/') {
+					return this.angka1 / this.angka2
+				}
+			}
+		},
+		methods:{
+			ganti_operasi(val){
+				this.operasi = val
+			}
+		},
+		mounted(){
+			alert('Selamat Datang di kalkulator')
+		}
+	})
+
+	var app = new Vue({
+		el: '#app',
+		data: {
+			teks: 'Hello'
+		},
+		components: {
+			'judul': Judul
+		},
+	})
+</script>
+
+</body>
+</html>

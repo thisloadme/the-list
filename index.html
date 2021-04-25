@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Belajar Vue</title>
+	<script src="vue.min.js"></script>
+	<style type="text/css">
+		.hijau{
+			text-decoration: none;
+			color: green
+		}
+		.uppercase{
+			text-transform: text-uppercase;
+		}
+	</style>
+</head>
+<body>
+	<div id="app">
+		
+		<!-- v-once : agar yang ada di dalamnya tidak bisa berubah, statis selamanya -->
+		<!-- v-html="nama_var" : untuk text HTML (hati hati terhadap XSS) -->
+		<!-- v-bind:attr="val" : untuk membinding nilai vue ke dalam atribute html, bisa disingkat :attr doang  --> 
+		<!-- v-text="nama_var" : sama dengan {{ }} -->
+		<!-- v-show="nama_var" : ketika truE, show, butuh variabel boolean, (display none)  -->
+		<!-- v-if="nama_var (berkondisi juga bisa)" : sama kaya v-show  (tidak dirender)-->
+		<!-- v-else-if -->
+		<!-- v-else : lanjutannya v-if -->
+		
+		<!-- v-on:fun="val" : event listener on..., juga bisa manipulasi objek data attr-->
+		<!-- v-on:fun="val" bisa ditulis @fun="val" -->
+		<!-- modifier v-on -->
+		<!-- .prevent : sama aja preventDefault() -->
+		<!-- .once : agar hanya bisa diakses sekali  -->
+		<!-- dll -->
+		<!-- modifier bisa digabung -->
+
+		<!-- v-for="val in/of var" : untuk perulangan array/objek 1 dimensi -->
+		<!-- v-for="(val, index) in/of var" : untuk perulangan array/objek asosiatif -->
+		<!-- v-for="(val, key, index) in/of var" : untuk perulangan objek_ -->
+		<!-- sangat direkomen untuk menggunakan v-bind:key="unik" ketika loop -->
+		<!-- v-for bisa digabung dengan v-if untuk mencipatakan kondisi, tapi index array jadi tidak berurutan --> 
+
+		<!-- vm.$set(array, index, val) : untuk mengubah array, obyek lewat console atau lewat manapun -->
+		<!-- vm.objek = Object.assign({}, vm.objek, {'key':'val'}) : untuk menambah index objek baru-->
+		<!-- $event.target.value : untuk mengambil nilai saat ini di sebuah inputan -->
+		<p><strong>Mengambil data dari Collection</strong></p>
+		<table border="1">
+			<tr>
+				<td>Nama</td>
+				<td>Umur</td>
+				<td>Tgl</td>
+			</tr>
+			<tr v-for="(val, index) in collection_" :key="index" v-if="val.umur < 20">
+				<td>{{ val.nama }}</td>
+				<td>{{ val.umur }}</td>
+				<td>{{ val.tgl }}</td>
+			</tr>
+		</table>
+
+		<hr>
+		<p><strong>Mengambil data dari Array yang sudah di filter</strong></p>
+		<ul>
+			<li v-for="(data, index) in filterArray">
+				{{ index+1 }}. {{ data }}
+			</li>
+		</ul>
+
+		<hr>
+		<p><strong>Mengambil data dari Objek</strong></p>
+		<ul>
+			<li v-for="(val,key,index) in objek_">
+				{{ index+1 }}. {{ key }}: {{ val }}
+			</li>
+		</ul>
+
+		<hr>
+		<p><strong>Mengambil data dari Array</strong></p>
+		<ul>
+			<li v-for="(data, index) in array_">
+				{{ index+1 }}. {{ data }}
+			</li>
+		</ul>
+
+		<hr>
+		<p><strong>Event</strong></p>
+		<button @click.right="link()">Klik dengan klik kanan</button><br>
+		<br>
+		<button @click.ctrl.exact="link()">Pencet CTRL sambil klik</button><br>
+		<br>
+		<input placeholder="klik enter, maka aku akan muncul" type="text" @keyup.enter="info('Hay ' + $event.target.value)"><br>
+		<br>
+		<a href="http://www.google.com" @mouseover.once="link()">Hover Me</a><br>
+		<br>
+		<button onclick="vm.itung_klik_ --">Itung -</button>
+		<button @click="itung_klik_ ++">Itung +</button>
+		<p>Button ini sudah diklik {{ itung_klik_ }} kali</p>
+		<br>
+		<button v-on:click="info('Yuhuu')">Click</button>
+
+		<hr>
+		<p><strong>Range Kondisi</strong></p>
+		<p>Angka anda {{ int_ }}</p>
+		<p>Status Anda : 
+			<span v-if="int_ > 20">Besar</span>
+			<span v-else-if="int_ > 10 && int_ <=20">Sedang</span>
+			<span v-else>Kecil</span>
+		</p>
+		
+		<hr>
+		<p><strong>String</strong></p>
+		<p v-bind:id="'tulisan_'+string_">{{ string_ }}</p>
+		<!-- dengan boolean juga bisa -->
+		<p :class="{ hijau:bool_ }">class boolean</p> 
+		<!-- v-bind berkelompok -->
+		<p v-bind="{class: ijo_, id: 'testing'}">bind attr kelompok</p>
+		<!-- attr dinamis -->
+		<p :[attr_]="ijo_">Dynamic Attr</p>
+		<p :class="[ijo_, uppercase_]">{{ string_.split(' ')[0] }}</p>
+		<p v-html="link_"></p>
+
+		<!-- memanggil filters, dengan tanda | -->
+		<!-- sesama filters dipisah dengan | juga -->
+		<hr>
+		<p><strong>If Else boolean, dan Filter string</strong></p>
+		<h1 v-if="bool_" v-once>{{ 'Text : ' + string_ | upper }}</h1>  
+		<h1 v-else v-once>{{ 'Text : ' + string_ }}</h1>  
+
+		<!-- memanggil method increment dan decrement di objek vm -->
+		<hr>
+		<p><strong>Filter Format Mata Uang</strong></p>
+		<p>{{ int_ | formatCurrency('IDR') }}</p> <!-- memanggil filter juga --> 
+		<button onclick="vm.increment()">Tambahin</button>
+		<button onclick="vm.decrement()">Kurangin</button>
+
+		<hr>
+		<p><strong>Memanggil computed</strong></p>
+		<!-- memanggil computed -->
+		<h1>{{ now }}</h1>
+		<p>{{ nama_dan_umur }}</p>
+
+		<hr>
+		<p><strong>Ternary boolean</strong></p>
+		<!-- ternary data boolean -->
+		<p>{{ bool_ }} : {{ bool_ ? 'Yeah benar' : 'Yah salah' }}</p>  
+
+	</div>
+
+	<script type="text/javascript">
+		var vm = new Vue({
+			el: '#app', //id //seperti viewnya
+			data:{ //variabel  //seperti modelnya
+				string_: 'Dion Budi Riyanto', 
+				link_: '<a href="google.com">Klik ini</a>', 
+				objek_: {
+					'data1': 'Dion',
+					'data2': 'Budi',
+					'data3': 'Riyanto'
+				},
+				int_: 18,
+				bool_: true,
+				array_: ['data satu', 'data dua', 'data tiga'],
+				collection_:[
+					{
+						'nama': 'Dion',
+						'umur': '20',
+						'tgl': '3'
+					},{
+						'nama': 'Yuhuu',
+						'umur': '19',
+						'tgl': '23'
+					},{
+						'nama': 'Testing',
+						'umur': '15',
+						'tgl': '18'
+					},
+				],
+				ijo_: 'hijau',
+				uppercase_: 'uppercase',
+				itung_klik_: 0,
+				attr_: 'class'
+			},
+			// method: properti untuk membuat fungsi, yang bisa dipanggil di satu file ini (PBO: Prosedur, tak return)
+			// dipanggil kaya fungsi biasa pake ()
+			methods: {
+				increment(){
+					this.int_++
+				},
+				decrement(){
+					this.int_--
+				},
+				info(val){
+					alert(val);
+				},
+				link(){
+					alert('GO');
+				}
+			},
+
+			// computed: (PBO: Fungsi, return) sebuah variabel yang nlainya berasal dari variabel lain
+			// ga boleh ada parameter
+			// dipanggil this.nama_umur bukan this.nama_umur(), karena dianggapnya variabel, bukan fungsi
+			computed: {
+				nama_dan_umur: function () {
+					return this.string_ + ' Umurnya ' + this.int_
+				},
+				now: function(){
+					return Date.now()
+				},
+				// memfilter array_ hanya yang berawalan huruf s
+				filterArray: function(){
+					return this.array_.filter((book) => {
+						return book[0] === 'd'
+					})
+				}
+
+			},
+
+			// memanggil filter untuk memanipulasi tampilan 
+			// filters ga bisa dipanggil dari objek vue
+			filters: {
+				upper(text){
+					return text.toUpperCase();
+				},
+
+				formatCurrency (value, currency) {
+					var formatter = new Intl.NumberFormat('id-ID', {
+						style: 'currency',
+						currency: currency,
+						minimumFractionDigits: 2,
+					});
+					return formatter.format(value)
+				}
+
+			},
+			//properti template, menggantikan semua yang ada di el (#app)
+			// prioritas setelah render
+			// biasa buat component
+			// template: '<p>{{ objek_ }}</p>', 
+
+			//sama kaya properti template
+			// render (createElement) {
+			// 	return createElement('h1', this.string_)
+			// },
+			// atau ditulis gini
+			// render: h => h(App),
+
+			beforeCreate () {  //sebuah hook sesaat setelah komponen diinisialisasi, belum bisa akses properti 'data'
+				console.log('before create: '+ 'message = ' + this.string_)
+			},
+			// bentuk panjangnya = created: function()
+			created () {  //seuah hook setelah objek vue diciptakan, bisa akses properti 'data'
+				console.log('created: '+ 'message = ' + this.string_)
+			},
+
+			// hook untuk akses DOM
+			beforeMount() {  //hook ketika template di compile, menampilkan variabel yang belum di isi
+				console.log('before mount: ' + 'el = ' + this.$el.textContent)
+			},
+			mounted() {  //hook ketika template di compile, menampilkan variabel yang sudah di isi
+				console.log('before mount: ' + 'el = ' + this.$el.textContent)
+			},
+
+			//hook ketika user mengupdate DOM, muncul ketika update berlangsung
+			beforeUpdate() {  //menampilkan data sebelum isi component el di ubah
+				console.log('before update: '+'el = ' + this.string_)
+			},
+			updated() {  //menampilkan data setelah isi component el di ubah
+				console.log('update: '+'el = ' + this.string_)
+			},
+
+			//hook untuk destroy objek
+			beforeDestroy () {
+				console.log('before destroy')
+			},
+			destroyed () {
+				console.log('destroyed')
+			},
+
+		});
+
+		// setInterval(() => {
+		// 	vm.now
+		// }, 100)
+
+		//destroy objek vm
+		// vm.$destroy();
+
+		//gabungan before update, dengan tambahan fitur newValue dan oldValue
+		// vm.$watch('string_', function (newValue, oldValue) {  
+		// 	console.log('Var string_ diubah dari '+oldValue+
+		// 	' menjadi '+newValue)
+		// })
+
+		// console.log(vm.$data);
+		// console.log(vm.$el); // mengakses atribut yang ada di suatu objek (vm)
+		// vm.$mount('#app'); //cara lain selain attr el:
+	</script>
+</body>
+</html>
